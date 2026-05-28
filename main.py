@@ -1,24 +1,23 @@
 """
-Amazon Jobs Dashboard — Backend + Frontend
-============================================
-This file does two things:
-  1. Serves the dashboard HTML when you visit the root URL /
-  2. Provides the /jobs API endpoint that fetches from Amazon Jobs
+Amazon Warehouse Jobs Dashboard — Backend + Frontend
+======================================================
+Fetches hourly warehouse job listings from https://hiring.amazon.ca
+using a headless browser (Playwright) since the site is JavaScript-powered.
 
-HOW TO DEPLOY (Render.com):
-  Replace your existing main.py on GitHub with this file.
-  Render will auto-redeploy in ~2 minutes.
-
-Then just visit: https://amazon.jobai-handler.onrender.com
+RENDER DEPLOYMENT:
+  Build Command:  pip install -r requirements.txt && playwright install chromium --with-deps
+  Start Command:  uvicorn main:app --host 0.0.0.0 --port $PORT
 """
 
 import re
 import time
-import requests
+import asyncio
+import json
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from typing import Optional
+from playwright.async_api import async_playwright
 
 app = FastAPI()
 
@@ -30,68 +29,156 @@ app.add_middleware(
 )
 
 _cache: dict = {"data": None, "timestamp": 0}
-CACHE_TTL_SECONDS = 600
+CACHE_TTL_SECONDS = 600  # 10 minutes
+
+
+# ── Scraper ────────────────────────────────────────────────────────────────
+
+async def scrape_amazon_ca_jobs(keyword: str = "warehouse") -> list[dict]:
+    """
+    Opens hiring.amazon.ca in a headless browser, waits for jobs to load,
+    captures the API response, and returns the job list.
+    """
+    jobs = []
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-dev-shm-usage"]
+        )
+        context = await browser.new_context(
+            locale="en-CA",
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+        )
+
+        api_jobs = []
+
+        # Intercept the network call that hiring.amazon.ca makes for jobs
+        async def handle_response(response):
+            url = response.url
+            if "api/jobs" in url or "jobSearch" in url.lower() or "search" in url and "amazon" in url:
+                try:
+                    body = await response.json()
+                    # Amazon HVH API returns jobs in different shapes — try common keys
+                    found = (
+                        body.get("jobs")
+                        or body.get("jobResults")
+                        or body.get("data", {}).get("jobs")
+                        or body.get("results")
+                        or []
+                    )
+                    if found:
+                        api_jobs.extend(found)
+                except Exception:
+                    pass
+
+        page = await context.new_page()
+        page.on("response", handle_response)
+
+        # Navigate to the job search page with warehouse keyword
+        search_url = f"https://hiring.amazon.ca/app#/jobSearch?keywords={keyword}&locale=en-CA"
+        await page.goto(search_url, wait_until="networkidle", timeout=30000)
+
+        # Wait a moment for any lazy-loaded content
+        await asyncio.sleep(3)
+
+        # If we got data from the API intercept, use that
+        if api_jobs:
+            for job in api_jobs:
+                jobs.append(clean_job(job))
+        else:
+            # Fallback: parse the DOM directly
+            job_cards = await page.query_selector_all("[data-test='job-card'], .job-card, [class*='jobCard'], [class*='job-tile']")
+            for card in job_cards:
+                title = await card.inner_text()
+                jobs.append({
+                    "id": "",
+                    "title": title.strip()[:80] if title else "Warehouse Associate",
+                    "team": "Warehouse",
+                    "location": "Canada",
+                    "type": "Full-time",
+                    "posted": "Recently",
+                    "description": "Visit hiring.amazon.ca for full details.",
+                    "apply_url": "https://hiring.amazon.ca/app#/jobSearch",
+                    "pay": "",
+                })
+
+        await browser.close()
+
+    return jobs
+
+
+def clean_job(job: dict) -> dict:
+    """Normalises a raw job object from hiring.amazon.ca into our standard shape."""
+    raw_desc = job.get("jobDescription") or job.get("description") or job.get("summary") or ""
+    clean_desc = re.sub(r"<[^>]+>", "", raw_desc.replace("<br>", " ")).strip()
+    if len(clean_desc) > 220:
+        clean_desc = clean_desc[:220].rstrip() + "…"
+
+    job_id = job.get("jobId") or job.get("id") or job.get("requisitionId") or ""
+    apply_path = job.get("applyUrl") or job.get("jobUrl") or ""
+    apply_url = (
+        apply_path if apply_path.startswith("http")
+        else f"https://hiring.amazon.ca/app#/jobSearch"
+    )
+
+    location_obj = job.get("location") or {}
+    if isinstance(location_obj, dict):
+        city = location_obj.get("city") or location_obj.get("name") or ""
+        province = location_obj.get("state") or location_obj.get("province") or ""
+        location = f"{city}, {province}".strip(", ") if city or province else job.get("locationName", "Canada")
+    else:
+        location = str(location_obj) or job.get("locationName", "Canada")
+
+    pay = job.get("pay") or job.get("payRate") or job.get("basePay") or ""
+    if isinstance(pay, dict):
+        pay = f"${pay.get('min', '')}–${pay.get('max', '')} {pay.get('unit', '/hr')}".strip()
+
+    return {
+        "id": str(job_id),
+        "title": job.get("title") or job.get("jobTitle") or "Warehouse Associate",
+        "team": job.get("jobType") or job.get("category") or "Warehouse",
+        "location": location,
+        "type": job.get("scheduleType") or job.get("employmentType") or "Full-time",
+        "posted": job.get("postedDate") or job.get("createdAt") or "Recently",
+        "description": clean_desc or "Visit hiring.amazon.ca to see the full job description.",
+        "apply_url": apply_url,
+        "pay": str(pay),
+    }
+
+
+# ── Dashboard HTML ─────────────────────────────────────────────────────────
 
 DASHBOARD_HTML = open("dashboard.html").read()
 
 
+# ── Routes ─────────────────────────────────────────────────────────────────
+
 @app.get("/", response_class=HTMLResponse)
 def serve_dashboard():
+    """Serves the full dashboard — just visit your Render URL."""
     return DASHBOARD_HTML
 
 
-def fetch_amazon_jobs(keyword: str, location: str, limit: int) -> list[dict]:
-    url = "https://www.amazon.jobs/en/search.json"
-    params = {
-        "base_query": keyword,
-        "loc_query": location,
-        "result_limit": limit,
-        "sort": "recent",
-    }
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://www.amazon.jobs/en/search",
-        "X-Requested-With": "XMLHttpRequest",
-    }
-    response = requests.get(url, params=params, headers=headers, timeout=15)
-    response.raise_for_status()
-    raw_jobs = response.json().get("jobs", [])
-
-    clean_jobs = []
-    for job in raw_jobs:
-        raw_desc = job.get("description_short") or job.get("description") or ""
-        clean_desc = re.sub(r"<[^>]+>", "", raw_desc.replace("<br>", " ")).strip()
-        if len(clean_desc) > 200:
-            clean_desc = clean_desc[:200].rstrip() + "…"
-        job_path = job.get("job_path", "")
-        clean_jobs.append({
-            "id": job.get("id_icims", ""),
-            "title": job.get("title", "Unknown Title"),
-            "team": job.get("team", {}).get("label", "Amazon") if isinstance(job.get("team"), dict) else job.get("team", "Amazon"),
-            "location": job.get("location", location),
-            "type": job.get("job_schedule_type", "Full-time"),
-            "posted": job.get("posted_date", "Recently"),
-            "description": clean_desc,
-            "apply_url": f"https://www.amazon.jobs{job_path}" if job_path else "https://www.amazon.jobs/en/search",
-        })
-    return clean_jobs
-
-
 @app.get("/jobs")
-def get_jobs(
-    keyword: str = Query(default="data warehouse"),
-    location: str = Query(default="oriana"),
-    limit: int = Query(default=20, ge=1, le=50),
+async def get_jobs(
+    keyword: str = Query(default="warehouse", description="Job keyword to search"),
     team: Optional[str] = Query(default=None),
     job_type: Optional[str] = Query(default=None),
     refresh: bool = Query(default=False),
 ):
+    """
+    Returns warehouse job listings from hiring.amazon.ca.
+
+    Examples:
+      GET /jobs                         → warehouse jobs (default)
+      GET /jobs?keyword=fulfillment     → fulfillment centre jobs
+      GET /jobs?refresh=true            → skip cache and re-fetch
+    """
     global _cache
     now = time.time()
     cache_expired = (now - _cache["timestamp"]) > CACHE_TTL_SECONDS
@@ -99,7 +186,7 @@ def get_jobs(
     if not refresh and _cache["data"] and not cache_expired:
         jobs = _cache["data"]
     else:
-        jobs = fetch_amazon_jobs(keyword, location, limit)
+        jobs = await scrape_amazon_ca_jobs(keyword=keyword)
         _cache = {"data": jobs, "timestamp": now}
 
     if team:
@@ -110,8 +197,8 @@ def get_jobs(
     return {
         "success": True,
         "count": len(jobs),
+        "source": "hiring.amazon.ca",
         "keyword": keyword,
-        "location": location,
         "cached": not cache_expired,
         "jobs": jobs,
     }

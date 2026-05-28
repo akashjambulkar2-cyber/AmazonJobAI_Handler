@@ -3,542 +3,183 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amazon Jobs — Data Warehouse Dashboard</title>
+  <title>Amazon Canada — Warehouse Jobs Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #f7f6f2;
-      --surface: #ffffff;
-      --surface-2: #f0ede8;
-      --border: #e2ddd8;
-      --border-strong: #c8c3bc;
-      --text: #1a1714;
-      --text-2: #5c574f;
-      --text-3: #9c978f;
-      --accent: #1a4f8a;
-      --accent-bg: #e8f0fa;
-      --green: #2d6a4f;
-      --green-bg: #eaf4ee;
-      --amber: #7a4f1a;
-      --amber-bg: #fdf3e3;
-      --red: #7a1a1a;
-      --red-bg: #fdeaea;
-      --purple: #4a2a7a;
-      --purple-bg: #f0eafd;
-      --radius: 10px;
-      --radius-sm: 6px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --bg: #f7f6f2; --surface: #ffffff; --surface-2: #f0ede8;
+      --border: #e2ddd8; --border-strong: #c8c3bc;
+      --text: #1a1714; --text-2: #5c574f; --text-3: #9c978f;
+      --accent: #1a4f8a; --accent-bg: #e8f0fa;
+      --green: #2d6a4f; --green-bg: #eaf4ee;
+      --amber: #7a4f1a; --amber-bg: #fdf3e3;
+      --red: #7a1a1a; --red-bg: #fdeaea;
+      --purple: #4a2a7a; --purple-bg: #f0eafd;
+      --radius: 10px; --radius-sm: 6px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    /* ── Sidebar ── */
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     .layout { display: flex; min-height: 100vh; }
-
-    .sidebar {
-      width: 220px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-
-    .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 4px 20px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 8px;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 15px;
-    }
-
+    .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0 4px 20px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+    .logo-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; }
     .logo-text { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; }
     .logo-sub { font-size: 11px; color: var(--text-3); }
-
-    .sidebar-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      padding: 12px 8px 4px;
-    }
-
-    .sidebar-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      color: var(--text-2);
-      cursor: pointer;
-      border: none;
-      background: none;
-      width: 100%;
-      text-align: left;
-      transition: background 0.15s, color 0.15s;
-    }
-
+    .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); padding: 12px 8px 4px; }
+    .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 13px; color: var(--text-2); cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
     .sidebar-item:hover { background: var(--surface-2); color: var(--text); }
     .sidebar-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
     .sidebar-item i { width: 16px; font-size: 13px; }
-
-    .sidebar-kw {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    /* ── Main content ── */
     .main { flex: 1; padding: 32px; overflow-x: hidden; }
-
-    .topbar {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
     .topbar h1 { font-size: 22px; font-weight: 600; color: var(--text); }
     .topbar p { font-size: 13px; color: var(--text-3); margin-top: 3px; }
-
-    .topbar-actions { display: flex; gap: 8px; align-items: center; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-2);
-    }
-
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); }
     .btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
     .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
-    .btn.primary:hover { background: #153f70; border-color: #153f70; }
+    .btn.primary:hover { background: #153f70; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* ── Status bar ── */
-    .status-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--text-3);
-      margin-bottom: 20px;
-      padding: 8px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-    }
-
+    .status-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-3); margin-bottom: 20px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
     .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .dot.live { background: var(--green); }
     .dot.loading { background: var(--amber); animation: pulse 1s infinite; }
     .dot.err { background: var(--red); }
-
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-    /* ── Metrics ── */
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .metric-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-    }
-
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
     .metric-label { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
     .metric-value { font-size: 26px; font-weight: 600; color: var(--text); }
     .metric-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
-
-    /* ── Controls ── */
-    .controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .search-wrap {
-      flex: 1;
-      min-width: 200px;
-      position: relative;
-    }
-
-    .search-wrap i {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-3);
-      font-size: 13px;
-    }
-
-    .controls input, .controls select {
-      width: 100%;
-      height: 36px;
-      padding: 0 12px 0 32px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      background: var(--surface);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
+    .controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .search-wrap { flex: 1; min-width: 200px; position: relative; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 13px; }
+    .controls input, .controls select { height: 36px; padding: 0 12px 0 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; width: 100%; }
     .controls select { padding-left: 10px; min-width: 160px; width: auto; }
-
-    .controls input:focus, .controls select:focus {
-      border-color: var(--accent);
-    }
-
-    /* ── Jobs ── */
-    .jobs-count {
-      font-size: 13px;
-      color: var(--text-3);
-      margin-bottom: 12px;
-    }
-
+    .controls input:focus, .controls select:focus { border-color: var(--accent); }
+    .jobs-count { font-size: 13px; color: var(--text-3); margin-bottom: 12px; }
     .jobs-grid { display: flex; flex-direction: column; gap: 10px; }
-
-    .job-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      box-shadow: var(--shadow);
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .job-card:hover {
-      border-color: var(--border-strong);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .job-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
+    .job-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; box-shadow: var(--shadow); transition: border-color 0.15s, box-shadow 0.15s; }
+    .job-card:hover { border-color: var(--border-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .job-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
     .job-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .job-pay { font-size: 13px; font-weight: 500; color: var(--green); margin-top: 2px; }
     .job-id { font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; margin-top: 2px; }
-
-    .apply-btn {
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 14px;
-      border: 1px solid var(--accent);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--accent);
-      background: var(--accent-bg);
-      cursor: pointer;
-      transition: all 0.15s;
-      text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-
+    .apply-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border: 1px solid var(--accent); border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; color: var(--accent); background: var(--accent-bg); cursor: pointer; transition: all 0.15s; text-decoration: none; font-family: 'DM Sans', sans-serif; }
     .apply-btn:hover { background: var(--accent); color: white; }
-
-    .job-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 99px;
-      border: 1px solid transparent;
-      font-weight: 500;
-    }
-
+    .job-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 99px; border: 1px solid transparent; font-weight: 500; }
     .badge.team { background: var(--accent-bg); color: var(--accent); border-color: #c5d8f5; }
     .badge.loc { background: var(--green-bg); color: var(--green); border-color: #b8ddc9; }
     .badge.type { background: var(--purple-bg); color: var(--purple); border-color: #cfc0ef; }
     .badge.date { background: var(--surface-2); color: var(--text-3); border-color: var(--border); }
-
-    .job-desc {
-      font-size: 13px;
-      color: var(--text-2);
-      margin-top: 10px;
-      line-height: 1.65;
-    }
-
-    /* ── Empty state ── */
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-3);
-    }
-
+    .job-desc { font-size: 13px; color: var(--text-2); margin-top: 10px; line-height: 1.65; }
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-3); }
     .empty i { font-size: 36px; margin-bottom: 12px; display: block; }
     .empty p { font-size: 14px; margin-bottom: 6px; color: var(--text-2); }
     .empty small { font-size: 12px; }
-
-    /* ── Spinner ── */
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Skeleton loading ── */
-    .skeleton {
-      background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: var(--radius-sm);
-    }
-
+    .skel-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: var(--radius-sm); }
     @keyframes shimmer { to { background-position: -200% 0; } }
-
-    .skel-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 700px) {
-      .sidebar { display: none; }
-      .main { padding: 20px 16px; }
-      .metrics { grid-template-columns: repeat(2, 1fr); }
-    }
+    @media (max-width: 700px) { .sidebar { display: none; } .main { padding: 20px 16px; } .metrics { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
 <div class="layout">
-
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon"><i class="fa-solid fa-database"></i></div>
-      <div>
-        <div class="logo-text">Jobs Dashboard</div>
-        <div class="logo-sub">Data Warehouse</div>
-      </div>
+      <div class="logo-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+      <div><div class="logo-text">Warehouse Jobs</div><div class="logo-sub">hiring.amazon.ca</div></div>
     </div>
-
-    <div class="sidebar-label">Keywords</div>
-    <div class="sidebar-kw" id="kw-list">
-      <button class="sidebar-item active" data-kw="data warehouse" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-warehouse"></i> Data Warehouse
-      </button>
-      <button class="sidebar-item" data-kw="etl" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-arrows-rotate"></i> ETL
-      </button>
-      <button class="sidebar-item" data-kw="business intelligence" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-chart-pie"></i> Business Intelligence
-      </button>
-      <button class="sidebar-item" data-kw="analytics engineer" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-chart-line"></i> Analytics Engineer
-      </button>
-      <button class="sidebar-item" data-kw="redshift" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-circle-nodes"></i> Redshift
-      </button>
-      <button class="sidebar-item" data-kw="dbt" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-cubes"></i> dbt
-      </button>
-      <button class="sidebar-item" data-kw="data engineer" onclick="selectKeyword(this)">
-        <i class="fa-solid fa-code-branch"></i> Data Engineer
-      </button>
-    </div>
-
-    <div class="sidebar-label" style="margin-top:auto;">Backend</div>
-    <div style="font-size:11px; color:var(--text-3); padding:4px 8px; word-break:break-all; font-family:'DM Mono',monospace; line-height:1.6;">
-      amazon.jobai-handler<br>.onrender.com
-    </div>
+    <div class="sidebar-label">Job Type</div>
+    <button class="sidebar-item active" data-kw="warehouse" onclick="selectKeyword(this)"><i class="fa-solid fa-warehouse"></i> All Warehouse</button>
+    <button class="sidebar-item" data-kw="fulfillment" onclick="selectKeyword(this)"><i class="fa-solid fa-box"></i> Fulfillment Centre</button>
+    <button class="sidebar-item" data-kw="sortation" onclick="selectKeyword(this)"><i class="fa-solid fa-arrow-right-arrow-left"></i> Sortation Centre</button>
+    <button class="sidebar-item" data-kw="delivery station" onclick="selectKeyword(this)"><i class="fa-solid fa-truck"></i> Delivery Station</button>
+    <button class="sidebar-item" data-kw="xl warehouse" onclick="selectKeyword(this)"><i class="fa-solid fa-pallet"></i> XL Warehouse</button>
+    <button class="sidebar-item" data-kw="night shift" onclick="selectKeyword(this)"><i class="fa-solid fa-moon"></i> Night Shift</button>
+    <button class="sidebar-item" data-kw="part time" onclick="selectKeyword(this)"><i class="fa-solid fa-clock"></i> Part Time</button>
+    <div class="sidebar-label" style="margin-top:auto;">Source</div>
+    <div style="font-size:11px;color:var(--text-3);padding:4px 8px;word-break:break-all;font-family:'DM Mono',monospace;line-height:1.6;">hiring.amazon.ca</div>
   </aside>
-
-  <!-- Main -->
   <main class="main">
     <div class="topbar">
       <div>
-        <h1>Amazon Jobs — Data Warehouse</h1>
-        <p id="sub-title">Showing results for "data warehouse" · Location: Oriana</p>
+        <h1>Amazon Canada — Warehouse Jobs</h1>
+        <p id="sub-title">Showing all warehouse jobs · hiring.amazon.ca</p>
       </div>
-      <div class="topbar-actions">
-        <button class="btn primary" id="refresh-btn" onclick="loadJobs(true)">
-          <i class="fa-solid fa-rotate-right"></i> Refresh
-        </button>
-      </div>
+      <button class="btn primary" id="refresh-btn" onclick="loadJobs(true)">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
     </div>
-
-    <!-- Status bar -->
     <div class="status-bar" id="status-bar">
       <span class="dot loading"></span>
       <span id="status-text">Connecting to backend…</span>
-      <span style="margin-left:auto; font-family:'DM Mono',monospace;" id="status-time"></span>
+      <span style="margin-left:auto;font-family:'DM Mono',monospace;" id="status-time"></span>
     </div>
-
-    <!-- Metrics -->
     <div class="metrics">
-      <div class="metric-card">
-        <div class="metric-label">Total jobs</div>
-        <div class="metric-value" id="m-total">—</div>
-        <div class="metric-sub">fetched from Amazon</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Full-time</div>
-        <div class="metric-value" id="m-full">—</div>
-        <div class="metric-sub">permanent roles</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Remote</div>
-        <div class="metric-value" id="m-remote">—</div>
-        <div class="metric-sub">work from anywhere</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">New (7d)</div>
-        <div class="metric-value" id="m-new">—</div>
-        <div class="metric-sub">posted this week</div>
-      </div>
+      <div class="metric-card"><div class="metric-label">Total jobs</div><div class="metric-value" id="m-total">—</div><div class="metric-sub">from Amazon Canada</div></div>
+      <div class="metric-card"><div class="metric-label">Full-time</div><div class="metric-value" id="m-full">—</div><div class="metric-sub">permanent roles</div></div>
+      <div class="metric-card"><div class="metric-label">Part-time</div><div class="metric-value" id="m-part">—</div><div class="metric-sub">flexible hours</div></div>
+      <div class="metric-card"><div class="metric-label">With pay info</div><div class="metric-value" id="m-pay">—</div><div class="metric-sub">show hourly rate</div></div>
     </div>
-
-    <!-- Controls -->
     <div class="controls">
       <div class="search-wrap">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="search-input" placeholder="Search title or description…" oninput="filterJobs()" />
+        <input type="text" id="search-input" placeholder="Search title, location…" oninput="filterJobs()" />
       </div>
       <select id="type-filter" onchange="filterJobs()">
         <option value="">All job types</option>
         <option value="Full-time">Full-time</option>
-        <option value="Contract">Contract</option>
         <option value="Part-time">Part-time</option>
+        <option value="Seasonal">Seasonal</option>
       </select>
     </div>
-
     <div class="jobs-count" id="jobs-count"></div>
     <div class="jobs-grid" id="jobs-grid">
-      <!-- Skeleton placeholders while loading -->
       <div class="skel-card"><div class="skeleton" style="height:18px;width:60%"></div><div class="skeleton" style="height:12px;width:40%"></div><div class="skeleton" style="height:12px;width:90%"></div></div>
       <div class="skel-card"><div class="skeleton" style="height:18px;width:55%"></div><div class="skeleton" style="height:12px;width:35%"></div><div class="skeleton" style="height:12px;width:85%"></div></div>
       <div class="skel-card"><div class="skeleton" style="height:18px;width:65%"></div><div class="skeleton" style="height:12px;width:45%"></div><div class="skeleton" style="height:12px;width:80%"></div></div>
     </div>
   </main>
 </div>
-
 <script>
-  const BACKEND = "https://amazon.jobai-handler.onrender.com";
   let allJobs = [];
-  let currentKeyword = "data warehouse";
-
-  function relDays(s) {
-    if (!s) return 99;
-    if (s.toLowerCase() === "today") return 0;
-    const m = s.match(/(\d+)\s+day/);
-    return m ? parseInt(m[1]) : 99;
-  }
+  let currentKeyword = "warehouse";
 
   function updateMetrics(jobs) {
     document.getElementById('m-total').textContent = jobs.length;
-    document.getElementById('m-full').textContent = jobs.filter(j => (j.type || '').toLowerCase().includes('full')).length;
-    document.getElementById('m-remote').textContent = jobs.filter(j => (j.location || '').toLowerCase().includes('remote')).length;
-    document.getElementById('m-new').textContent = jobs.filter(j => relDays(j.posted) <= 7).length;
+    document.getElementById('m-full').textContent = jobs.filter(j => (j.type||'').toLowerCase().includes('full')).length;
+    document.getElementById('m-part').textContent = jobs.filter(j => (j.type||'').toLowerCase().includes('part')).length;
+    document.getElementById('m-pay').textContent = jobs.filter(j => j.pay && j.pay.trim()).length;
   }
 
   function renderJobs(jobs) {
     const grid = document.getElementById('jobs-grid');
-    document.getElementById('jobs-count').textContent = `${jobs.length} job${jobs.length !== 1 ? 's' : ''} found`;
-
+    document.getElementById('jobs-count').textContent = jobs.length + ' job' + (jobs.length !== 1 ? 's' : '') + ' found';
     if (!jobs.length) {
-      grid.innerHTML = `
-        <div class="empty">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <p>No jobs match your filters</p>
-          <small>Try a different keyword from the sidebar or clear the search.</small>
-        </div>`;
+      grid.innerHTML = '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><p>No jobs match your filters</p><small>Try a different keyword from the sidebar or clear the search.</small></div>';
       return;
     }
-
     grid.innerHTML = jobs.map(j => `
       <div class="job-card">
         <div class="job-top">
           <div>
-            <div class="job-title">${j.title || 'Untitled Role'}</div>
+            <div class="job-title">${j.title || 'Warehouse Associate'}</div>
+            ${j.pay ? `<div class="job-pay"><i class="fa-solid fa-dollar-sign" style="font-size:11px"></i> ${j.pay}</div>` : ''}
             ${j.id ? `<div class="job-id">#${j.id}</div>` : ''}
           </div>
-          <a class="apply-btn" href="${j.apply_url || '#'}" target="_blank" rel="noopener">
+          <a class="apply-btn" href="${j.apply_url || 'https://hiring.amazon.ca/app#/jobSearch'}" target="_blank" rel="noopener">
             <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply
           </a>
         </div>
         <div class="job-meta">
-          ${j.team ? `<span class="badge team"><i class="fa-solid fa-users"></i>${j.team}</span>` : ''}
-          ${j.location ? `<span class="badge loc"><i class="fa-solid fa-location-dot"></i>${j.location}</span>` : ''}
+          ${j.team ? `<span class="badge team"><i class="fa-solid fa-boxes-stacked"></i> ${j.team}</span>` : ''}
+          ${j.location ? `<span class="badge loc"><i class="fa-solid fa-location-dot"></i> ${j.location}</span>` : ''}
           ${j.type ? `<span class="badge type">${j.type}</span>` : ''}
-          ${j.posted ? `<span class="badge date"><i class="fa-regular fa-clock"></i>${j.posted}</span>` : ''}
+          ${j.posted ? `<span class="badge date"><i class="fa-regular fa-clock"></i> ${j.posted}</span>` : ''}
         </div>
         ${j.description ? `<div class="job-desc">${j.description}</div>` : ''}
       </div>`).join('');
@@ -548,24 +189,17 @@
     const q = document.getElementById('search-input').value.toLowerCase();
     const type = document.getElementById('type-filter').value;
     const filtered = allJobs.filter(j => {
-      const matchQ = !q || (j.title || '').toLowerCase().includes(q) || (j.description || '').toLowerCase().includes(q);
-      const matchTy = !type || (j.type || '').toLowerCase().includes(type.toLowerCase());
+      const matchQ = !q || (j.title||'').toLowerCase().includes(q) || (j.location||'').toLowerCase().includes(q) || (j.description||'').toLowerCase().includes(q);
+      const matchTy = !type || (j.type||'').toLowerCase().includes(type.toLowerCase());
       return matchQ && matchTy;
     });
     renderJobs(filtered);
   }
 
   function setStatus(type, msg) {
-    const bar = document.getElementById('status-bar');
-    const dot = bar.querySelector('.dot');
-    dot.className = `dot ${type}`;
+    document.querySelector('#status-bar .dot').className = 'dot ' + type;
     document.getElementById('status-text').textContent = msg;
-    if (type === 'live') {
-      const now = new Date();
-      document.getElementById('status-time').textContent = `Updated ${now.toLocaleTimeString()}`;
-    } else {
-      document.getElementById('status-time').textContent = '';
-    }
+    document.getElementById('status-time').textContent = type === 'live' ? 'Updated ' + new Date().toLocaleTimeString() : '';
   }
 
   function selectKeyword(el) {
@@ -579,39 +213,28 @@
     const btn = document.getElementById('refresh-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading…';
-
-    document.getElementById('sub-title').textContent = `Showing results for "${currentKeyword}" · Location: Oriana`;
+    document.getElementById('sub-title').textContent = 'Showing "' + currentKeyword + '" jobs · hiring.amazon.ca';
     document.getElementById('search-input').value = '';
     document.getElementById('type-filter').value = '';
-    setStatus('loading', `Fetching "${currentKeyword}" jobs from Amazon Jobs…`);
+    setStatus('loading', 'Fetching "' + currentKeyword + '" jobs from hiring.amazon.ca…');
 
-    const params = new URLSearchParams({
-      keyword: currentKeyword,
-      location: 'oriana',
-      limit: 20,
-      ...(forceRefresh ? { refresh: 'true' } : {})
-    });
+    const params = new URLSearchParams({ keyword: currentKeyword });
+    if (forceRefresh) params.set('refresh', 'true');
 
     try {
-      const res = await fetch(`/jobs?${params}`);
-      if (!res.ok) throw new Error(`Server responded with status ${res.status}`);
+      const res = await fetch('/jobs?' + params);
+      if (!res.ok) throw new Error('Server error ' + res.status);
       const data = await res.json();
       allJobs = data.jobs || [];
       updateMetrics(allJobs);
       renderJobs(allJobs);
-      const note = data.cached ? 'served from cache' : 'freshly fetched';
-      setStatus('live', `Live · ${allJobs.length} jobs loaded · ${note}`);
+      setStatus('live', 'Live · ' + allJobs.length + ' jobs · ' + (data.cached ? 'from cache' : 'freshly fetched from hiring.amazon.ca'));
     } catch (err) {
       allJobs = [];
-      document.getElementById('jobs-grid').innerHTML = `
-        <div class="empty">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <p>Could not reach the backend</p>
-          <small>${err.message} — check that your Render service is running, then try Refresh.</small>
-        </div>`;
+      document.getElementById('jobs-grid').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Could not load jobs</p><small>' + err.message + '</small></div>';
       document.getElementById('jobs-count').textContent = '';
-      setStatus('err', `Backend unreachable: ${err.message}`);
-      ['m-total','m-full','m-remote','m-new'].forEach(id => document.getElementById(id).textContent = '—');
+      setStatus('err', 'Error: ' + err.message);
+      ['m-total','m-full','m-part','m-pay'].forEach(id => document.getElementById(id).textContent = '—');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Refresh';
