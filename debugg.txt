@@ -1,99 +1,50 @@
-      src/greenlet/TPythonState.cpp: In constructor ‘greenlet::PythonState::PythonState()’:
-      src/greenlet/TPythonState.cpp:12:6: error: class ‘greenlet::PythonState’ does not have any field named ‘cframe’
-Menu
-         12 |     ,cframe(nullptr)
-            |      ^~~~~~
-      src/greenlet/TPythonState.cpp:79:11: error: ‘class greenlet::PythonState’ has no member named ‘cframe’
-         79 |     this->cframe = &PyThreadState_GET()->root_cframe;
-            |           ^~~~~~
-      src/greenlet/TPythonState.cpp:79:42: error: ‘PyThreadState’ {aka ‘struct _ts’} has no member named ‘root_cframe’
-         79 |     this->cframe = &PyThreadState_GET()->root_cframe;
-            |                                          ^~~~~~~~~~~
-      src/greenlet/TPythonState.cpp: In member function ‘void greenlet::PythonState::operator<<(const PyThreadState*)’:
-      src/greenlet/TPythonState.cpp:125:11: error: ‘class greenlet::PythonState’ has no member named ‘cframe’
-        125 |     this->cframe = tstate->cframe;
-            |           ^~~~~~
-      src/greenlet/TPythonState.cpp:125:28: error: ‘const PyThreadState’ {aka ‘const struct _ts’} has no member named ‘cframe’
-        125 |     this->cframe = tstate->cframe;
-            |                            ^~~~~~
-      src/greenlet/TPythonState.cpp:133:31: error: ‘C_RECURSION_LIMIT’ was not declared in this scope
-        133 |     this->c_recursion_depth = C_RECURSION_LIMIT - tstate->c_recursion_remaining;
-            |                               ^~~~~~~~~~~~~~~~~
-      src/greenlet/TPythonState.cpp:133:59: error: ‘const PyThreadState’ {aka ‘const struct _ts’} has no member named ‘c_recursion_remaining’; did you mean ‘py_recursion_remaining’?
-        133 |     this->c_recursion_depth = C_RECURSION_LIMIT - tstate->c_recursion_remaining;
-            |                                                           ^~~~~~~~~~~~~~~~~~~~~
-            |                                                           py_recursion_remaining
-      src/greenlet/TPythonState.cpp:137:35: error: ‘const PyThreadState’ {aka ‘const struct _ts’} has no member named ‘cframe’
-        137 |     this->current_frame = tstate->cframe->current_frame;
-            |                                   ^~~~~~
-      src/greenlet/TPythonState.cpp:147:42: error: ‘const PyThreadState’ {aka ‘const struct _ts’} has no member named ‘trash’
-        147 |     this->trash_delete_nesting = tstate->trash.delete_nesting;
-            |                                          ^~~~~
-      src/greenlet/TPythonState.cpp: In member function ‘void greenlet::PythonState::unexpose_frames()’:
-      src/greenlet/TPythonState.cpp:169:51: error: invalid use of incomplete type ‘_PyInterpreterFrame’ {aka ‘struct _PyInterpreterFrame’}
-        169 |         _PyInterpreterFrame *prev_exposed = iframe->previous;
-            |                                                   ^~
-      /opt/render/project/python/Python-3.14.3/include/python3.14/cpython/pyframe.h:25:8: note: forward declaration of ‘_PyInterpreterFrame’ {aka ‘struct _PyInterpreterFrame’}
-         25 | struct _PyInterpreterFrame;
-            |        ^~~~~~~~~~~~~~~~~~~
-      src/greenlet/TPythonState.cpp:171:23: error: invalid use of incomplete type ‘_PyInterpreterFrame’ {aka ‘struct _PyInterpreterFrame’}
-        171 |         memcpy(&iframe->previous, &iframe->frame_obj->_f_frame_data[0],
-            |                       ^~
-      /opt/render/project/python/Python-3.14.3/include/python3.14/cpython/pyframe.h:25:8: note: forward declaration of ‘_PyInterpreterFrame’ {aka ‘struct _PyInterpreterFrame’}
-         25 | struct _PyInterpreterFrame;
-            |        ^~~~~~~~~~~~~~~~~~~
-      src/greenlet/TPythonState.cpp:171:42: error: invalid use of incomplete type ‘_PyInterpreterFrame’ {aka ‘struct _PyInterpreterFrame’}
-        171 |         memcpy(&iframe->previous, &iframe->frame_obj->_f_frame_data[0],
-            |                                          ^~
-      /opt/render/project/python/Python-3.14.3/include/python3.14/cpython/pyframe.h:25:8: note: forward declaration of ‘_PyInterpreterFrame’ {aka ‘struct _PyInterpreterFrame’}
-         25 | struct _PyInterpreterFrame;
-            |        ^~~~~~~~~~~~~~~~~~~
-      src/greenlet/TPythonState.cpp: In member function ‘void greenlet::PythonState::operator>>(PyThreadState*)’:
-      src/greenlet/TPythonState.cpp:188:13: error: ‘PyThreadState’ {aka ‘struct _ts’} has no member named ‘cframe’
-        188 |     tstate->cframe = this->cframe;
-            |             ^~~~~~
-      src/greenlet/TPythonState.cpp:188:28: error: ‘class greenlet::PythonState’ has no member named ‘cframe’
-        188 |     tstate->cframe = this->cframe;
-            |                            ^~~~~~
-      src/greenlet/TPythonState.cpp:202:13: error: ‘PyThreadState’ {aka ‘struct _ts’} has no member named ‘c_recursion_remaining’; did you mean ‘py_recursion_remaining’?
-        202 |     tstate->c_recursion_remaining = C_RECURSION_LIMIT - this->c_recursion_depth;
-            |             ^~~~~~~~~~~~~~~~~~~~~
-            |             py_recursion_remaining
-      src/greenlet/TPythonState.cpp:202:37: error: ‘C_RECURSION_LIMIT’ was not declared in this scope
-        202 |     tstate->c_recursion_remaining = C_RECURSION_LIMIT - this->c_recursion_depth;
-            |                                     ^~~~~~~~~~~~~~~~~
-      src/greenlet/TPythonState.cpp:207:13: error: ‘PyThreadState’ {aka ‘struct _ts’} has no member named ‘cframe’
-        207 |     tstate->cframe->current_frame = this->current_frame;
-            |             ^~~~~~
-      src/greenlet/TPythonState.cpp:213:13: error: ‘PyThreadState’ {aka ‘struct _ts’} has no member named ‘trash’
-        213 |     tstate->trash.delete_nesting = this->trash_delete_nesting;
-            |             ^~~~~
-      src/greenlet/TPythonState.cpp: At global scope:
-      src/greenlet/TPythonState.cpp:273:6: error: variable or field ‘set_new_cframe’ declared void
-        273 | void PythonState::set_new_cframe(_PyCFrame& frame) noexcept
-            |      ^~~~~~~~~~~
-      src/greenlet/TPythonState.cpp:273:34: error: ‘_PyCFrame’ was not declared in this scope; did you mean ‘_frame’?
-        273 | void PythonState::set_new_cframe(_PyCFrame& frame) noexcept
-            |                                  ^~~~~~~~~
-            |                                  _frame
-      src/greenlet/TPythonState.cpp:273:45: error: ‘frame’ was not declared in this scope; did you mean ‘_frame’?
-        273 | void PythonState::set_new_cframe(_PyCFrame& frame) noexcept
-            |                                             ^~~~~
-            |                                             _frame
-      src/greenlet/greenlet.cpp: In function ‘PyObject* mod_get_tstate_trash_delete_nesting(PyObject*)’:
-      src/greenlet/greenlet.cpp:1341:36: error: ‘PyThreadState’ {aka ‘struct _ts’} has no member named ‘trash’
-       1341 |     return PyLong_FromLong(tstate->trash.delete_nesting);
-            |                                    ^~~~~
-      error: command '/usr/bin/g++' failed with exit code 1
-      [end of output]
-  
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-  ERROR: Failed building wheel for greenlet
-Failed to build greenlet
-[notice] A new release of pip is available: 25.3 -> 26.1.1
+Using cached pydantic-2.13.4-py3-none-any.whl (472 kB)
+Downloading pydantic_core-2.46.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 19.3 MB/s eta 0:00:00
+Using cached python_multipart-0.0.29-py3-none-any.whl (29 kB)
+Using cached starlette-0.37.2-py3-none-any.whl (71 kB)
+Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Downloading ujson-5.12.1-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (59 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.1/59.1 kB 5.7 MB/s eta 0:00:00
+Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Using cached anyio-4.13.0-py3-none-any.whl (114 kB)
+Using cached dnspython-2.8.0-py3-none-any.whl (331 kB)
+Downloading httptools-0.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (464 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 464.7/464.7 kB 7.1 MB/s eta 0:00:00
+Using cached idna-3.17-py3-none-any.whl (65 kB)
+Downloading markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Using cached python_dotenv-1.2.2-py3-none-any.whl (22 kB)
+Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 31.2 MB/s eta 0:00:00
+Using cached rich_toolkit-0.19.10-py3-none-any.whl (33 kB)
+Using cached typer-0.26.2-py3-none-any.whl (123 kB)
+Using cached typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+Downloading uvloop-0.22.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.8/3.8 MB 45.7 MB/s eta 0:00:00
+Downloading watchfiles-1.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 456.9/456.9 kB 50.4 MB/s eta 0:00:00
+Downloading websockets-16.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 184.6/184.6 kB 29.8 MB/s eta 0:00:00
+Using cached certifi-2026.5.20-py3-none-any.whl (134 kB)
+Using cached annotated_doc-0.0.4-py3-none-any.whl (5.3 kB)
+Using cached rich-15.0.0-py3-none-any.whl (310 kB)
+Using cached shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Using cached markdown_it_py-4.2.0-py3-none-any.whl (91 kB)
+Using cached pygments-2.20.0-py3-none-any.whl (1.2 MB)
+Using cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Installing collected packages: websockets, uvloop, ujson, typing-extensions, shellingham, pyyaml, python-multipart, python-dotenv, pygments, orjson, mdurl, MarkupSafe, idna, httptools, h11, greenlet, dnspython, click, certifi, annotated-types, annotated-doc, uvicorn, typing-inspection, pyee, pydantic-core, markdown-it-py, jinja2, httpcore, email_validator, anyio, watchfiles, starlette, rich, pydantic, playwright, httpx, typer, rich-toolkit, fastapi-cli, fastapi
+Successfully installed MarkupSafe-3.0.3 annotated-doc-0.0.4 annotated-types-0.7.0 anyio-4.13.0 certifi-2026.5.20 click-8.4.1 dnspython-2.8.0 email_validator-2.3.0 fastapi-0.111.0 fastapi-cli-0.0.24 greenlet-3.0.3 h11-0.16.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 idna-3.17 jinja2-3.1.6 markdown-it-py-4.2.0 mdurl-0.1.2 orjson-3.11.9 playwright-1.44.0 pydantic-2.13.4 pydantic-core-2.46.4 pyee-11.1.0 pygments-2.20.0 python-dotenv-1.2.2 python-multipart-0.0.29 pyyaml-6.0.3 rich-15.0.0 rich-toolkit-0.19.10 shellingham-1.5.4 starlette-0.37.2 typer-0.26.2 typing-extensions-4.15.0 typing-inspection-0.4.2 ujson-5.12.1 uvicorn-0.29.0 uvloop-0.22.1 watchfiles-1.2.0 websockets-16.0
+[notice] A new release of pip is available: 24.0 -> 26.1.1
 [notice] To update, run: pip install --upgrade pip
-error: failed-wheel-build-for-install
-× Failed to build installable wheels for some pyproject.toml based projects
-╰─> greenlet
+Installing dependencies...
+Switching to root user to install dependencies...
+Password: su: Authentication failure
+Failed to install browsers
+Error: Installation process exited with code: 1
 ==> Build failed 😞
 ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+==> Requesting Node.js version >=16
+==> Using Node.js version 26.2.0 via .venv/lib/python3.11/site-packages/playwright/driver/package/package.json
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+==> Installing Node.js version 26.2.0...
+Menu
